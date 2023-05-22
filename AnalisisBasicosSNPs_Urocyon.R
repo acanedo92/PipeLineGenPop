@@ -2,7 +2,7 @@
 # Análisis de Diversidad y Estructura Genética a partir de SNP's de un archivo VCF.#
 ####################################################################################
 # Instalación de paquetes:
-install.packages(c("adegenet", "hierfstat", "ape", "vcfR"))
+install.packages(c("adegenet", "hierfstat", "ape", "vcfR", "corrplot"))
 
 # Cargar paqueterías:
 
@@ -10,7 +10,7 @@ library(vcfR)
 library(adegenet)
 library(hierfstat)
 library(ape)
-
+library(corrplot)
 
 setwd ("/media/gabriela/ADATA_HD710/PipeLineGenPop/")
 
@@ -67,13 +67,17 @@ barplot(colSums(Richness$Ar),  las=2, col = myCol, ylab = "N. Alleles")
 ###################################
 # Analisis de estructura genetica #
 ###################################
+# Fst pareadas
+a.fstat <- genind2hierfstat(a)
+Fstat.metrics <- pairwise.neifst(a.fstat)
+corrplot(as.matrix(Fstat.metrics), is.corr = F, type = "lower", diag=F)      
 
-# Podemos estimar distancias para hacer heatmap de distancia gen??tica entre individuos
+# Podemos estimar distancias para hacer heatmap de distancia genetica entre individuos
 x.dist <- dist(a)
 heatmap(as.matrix(x.dist))
 
 # Estimar distancia genetica de Nei entre poblaciones
-b <- genind2genpop(a) # Requerimos primero trasnformar nuestros datos a formato genpop
+b <- genind2genpop(a) # Requerimos primero transformar nuestros datos a formato genpop
 y.dist<- dist.genpop(b, method = 1)
 heatmap(as.matrix(y.dist))
 
