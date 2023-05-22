@@ -1,3 +1,5 @@
+install.packages(c("adegenet", "hierfstat", "ape"))
+install.packages("vcfR")
 library (vcfR)
 library (adegenet)
 library (hierfstat)
