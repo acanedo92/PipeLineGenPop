@@ -1,20 +1,27 @@
-install.packages(c("adegenet", "hierfstat", "ape"))
-install.packages("vcfR")
-library (vcfR)
-library (adegenet)
-library (hierfstat)
-library (ape)
+####################################################################################
+# Análisis de Diversidad y Estructura Genética a partir de SNP's de un archivo VCF.#
+####################################################################################
+# Instalación de paquetes:
+install.packages(c("adegenet", "hierfstat", "ape", "vcfR"))
 
-setwd ("Documents/ECOSUR/Cursos/GeneticaConservacion2018/PracticaSNPs/")
+# Cargar paqueterías:
+
+library(vcfR)
+library(adegenet)
+library(hierfstat)
+library(ape)
+
+
+setwd ("/media/gabriela/ADATA_HD710/PipeLineGenPop/")
 
 # Cargar un archivo tipo vcf y convertirlo en objeto genind para analizar con adegente. En este caso nuestro archivo esta en formato Genpop y no es necesrio transformarlo.
-# a <- read.vcfR("FiltrosPlink/Filtro_LD.vcf")
+# a <- read.vcfR("File.vcf")
 # b <- vcfR2genind(a)
 # c <- vcfR2genlight(a)
 
 # Cargar archivo tipo genpop
 a <- read.genepop("GP_withgrays.gen")
-
+class(a)
 ##################################
 # Explorar nuestra base de datos #
 ##################################
@@ -23,8 +30,8 @@ a # Ver que tipo de objetos creamos
 a@ploidy # Ver la haploidia de los datos
 a@pop # Ver a las poblaciones en el objeto genind (@pop debe ser un factor)
 a@tab # Es la matriz de todos los datos o genotipos
-a@tab [c(1:5),c(1:5)] # Ver los datos en las primeras 5 filas y 5 columnas
-a@tab [,1] # Ver el nombre de los individuos
+a@tab[c(1:5),c(1:5)] # Ver los datos en las primeras 5 filas y 5 columnas
+a@tab[,1] # Ver el nombre de los individuos
 
 ###########################################
 # Analisis basicos de diversidad genetica #
@@ -33,34 +40,36 @@ a@tab [,1] # Ver el nombre de los individuos
 divers <- basic.stats(a) # Analisis global, todas las pobalcaiones
 divers$overall # Promedio de todos los datos. Todas las medidas de diversidad
 
-# Para obtener los promedios por poblaci??n
+# Para obtener los promedios por poblacionn
 colnames(divers$Ho) # Para ver el nombre de las poblaciones
-nombresPobs <- colnames(divers$Ho) # Hacer un objeto con el nombre de las poblaciones
-HO <- c(mean(divers$Ho[ ,1]), # Heterocigosis observada promedio de la poblaci??n 1
-        mean(divers$Ho[ ,2]),
-        mean(divers$Ho[ ,3]),
-        mean(divers$Ho[ ,4]),
-        mean(divers$Ho[ ,5]),
-        mean(divers$Ho[ ,6]),
-        mean(divers$Ho[ ,7]))
+levels(a@pop) 
 
-HO
-divers$overall$Ho
+nombresPobs <- colnames(divers$Ho) # Hacer un objeto con el nombre de las poblaciones
+HetObs <-  colMeans(divers$Ho)   # Heterocigosis observada promedio de la poblacion 1
+Richness <- allelic.richness(a) # Estima la riqueza alélica, los recuentos alélicos enrarecidos, por locus y población
 
 # Hacer un grafico de barras con los valores de heterocigosis observada.
-barplot (HO, xlab = "Populations", ylab="HO", col="red", names.arg = nombresPobs)
+barplot (HetObs, xlab = "Populations", ylab="HO", col="red", names.arg = nombresPobs)
 abline (h=0.1253) # Si queremos agregar una linea horizontal que se??ale el valor promedio, tomando el pormedio de la tabla divers$overall
 
 ##########################
 # Podemos hacer lo mismo para obtener los valores promedio de las demas medidas de diversidad.
 ##########################
 
+# dev.new()
+
+par(mfrow=c(1,3)) 
+myCol <- c("darkblue","purple","green","orange","red","blue", "black")
+barplot(colMeans(divers$Hs, na.rm = T), col = myCol , names.arg = nombresPobs, las=2, axis.lty = 6, axisnames = T, ylab = "H.S.", xlab = "Populations")
+barplot(colMeans(divers$Ho, na.rm = T), col = myCol, names.arg = nombresPobs, las=2, axis.lty = 6, axisnames = T, ylab = "H.O.",  xlab = "Populations")
+barplot(colSums(Richness$Ar),  las=2, col = myCol, ylab = "N. Alleles")
+                  
 ###################################
 # Analisis de estructura genetica #
 ###################################
 
 # Podemos estimar distancias para hacer heatmap de distancia gen??tica entre individuos
-x.dist <- dist (a)
+x.dist <- dist(a)
 heatmap(as.matrix(x.dist))
 
 # Estimar distancia genetica de Nei entre poblaciones
