@@ -45,7 +45,7 @@ colnames(divers$Ho) # Para ver el nombre de las poblaciones
 levels(a@pop) 
 
 nombresPobs <- colnames(divers$Ho) # Hacer un objeto con el nombre de las poblaciones
-HetObs <-  colMeans(divers$Ho)   # Heterocigosis observada promedio de la poblacion 1
+HetObs <-  colMeans(divers$Ho)   # Heterocigosis observada promedio de la poblacion 
 Richness <- allelic.richness(a) # Estima la riqueza alélica, los recuentos alélicos enrarecidos, por locus y población
 
 # Hacer un grafico de barras con los valores de heterocigosis observada.
@@ -67,22 +67,20 @@ barplot(colSums(Richness$Ar),  las=2, col = myCol, ylab = "N. Alleles")
 ###################################
 # Analisis de estructura genetica #
 ###################################
-# Fst pareadas
-a.fstat <- genind2hierfstat(a)
-Fstat.metrics <- pairwise.neifst(a.fstat)
-corrplot(as.matrix(Fstat.metrics), is.corr = F, type = "lower", diag=F)      
-
+ 
 # Podemos estimar distancias para hacer heatmap de distancia genetica entre individuos
 x.dist <- dist(a)
 heatmap(as.matrix(x.dist))
+
+# Fst pareadas entre poblaciones
+a.fstat <- genind2hierfstat(a)
+Fstat.metrics <- pairwise.neifst(a.fstat)
+corrplot(as.matrix(Fstat.metrics), is.corr = F, type = "lower", diag=F) 
 
 # Estimar distancia genetica de Nei entre poblaciones
 b <- genind2genpop(a) # Requerimos primero transformar nuestros datos a formato genpop
 y.dist<- dist.genpop(b, method = 1)
 heatmap(as.matrix(y.dist))
-
-# Hacer un Neighbor joining
-plot(nj(y.dist), type="fan")
 
 # Hacer un UPGMA
 c <- hclust(y.dist, method = "average")
