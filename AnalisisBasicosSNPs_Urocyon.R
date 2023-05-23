@@ -96,3 +96,21 @@ grp <- find.clusters(a, max.n.clust=15)
 
 myCol <- c("darkblue","purple","green","orange","red","blue", "black")
 scatter(dpca1, scree.da=FALSE, bg="white", pch=20,  cell=0, cstar=0, col=myCol, solid=.4,cex=3,clab=0, leg=TRUE, txt.leg=paste("Cluster",1:7))
+
+# Inbreeding Test
+F <- inbreeding(a, pop= a@pop)
+Fbar <- sapply(F , mean)
+hist(Fbar, xlab = "Endogamia por individuos", ylab= "Frecuencia", main="Zorritas")
+summary(Fbar)
+head(Fbar)  
+
+
+class(a)
+
+pops <- seppop(a)
+pops$grey16
+Fsri23 <- inbreeding(pops$sri23)
+Fsri23_bar <- sapply(Fsri23 , mean)
+dev.off()
+plot.new()
+hist(Fsri23_bar, xlab = "Endogamia por individuos", ylab= "Frecuencia", main="Zorritassri23")
